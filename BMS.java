@@ -279,7 +279,3 @@ class Billing {
         } while (!valid);
     }
 }
-
-class noSuchMovie extends RuntimeException {
-
-}
