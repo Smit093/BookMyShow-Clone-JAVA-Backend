@@ -137,7 +137,7 @@ class Moive {
             int n = sc.nextInt();
             // sc.nextLine();
             if (n == 0) {
-                Main.options();
+                Main.options();//to go to options
             }
             switch (n) {
                 case 1: {
