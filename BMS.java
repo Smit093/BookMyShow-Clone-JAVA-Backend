@@ -228,6 +228,7 @@ class MovieBooking {
             Main.seats = s;
             Booking.amount = s * price;
             Main.amount = (int) Booking.amount;
+            b.setName(Main.uName);
             b.start();
         }
     }
