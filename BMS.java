@@ -13,7 +13,8 @@ class Main {
     static int price, seats, amount;
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Welcome to our Application!!");
+        System.out.println("--------------------------Welcome to our Application------------------------------");
+        // System.out.println("Welcome to our Application!!");
         System.out.println("Hope you'll enjoy your booking experience");
         logIn();
     }
@@ -151,7 +152,7 @@ class Moive {
 
         switch (n) {
             case 1: {
-                MovieBooking.book("3EKK", 300);
+                MovieBooking.book("3EKKa", "PVR : Acropolis", "3:00 PM", "Friday", 300, 60);
                 Main.mName = "3 Ekka";
                 Main.tName = "PVR : Acropolis";
                 Main.time = "3:00 PM";
@@ -161,7 +162,7 @@ class Moive {
                 break;
             }
             case 2: {
-                MovieBooking.book("OMG2", 250);
+                MovieBooking.book("OMG2", "Cinepolis : Alpha One", "6:45 PM", "Saturday", 250, 70);
                 Main.mName = "OMG 2";
                 Main.tName = "Cinepolis : Alpha One";
                 Main.time = "6:45 PM";
@@ -171,7 +172,7 @@ class Moive {
                 break;
             }
             case 3: {
-                MovieBooking.book("BATMAN", 350);
+                MovieBooking.book("BATMAN", "Rajhans Cinemas", "10:30 PM", "Sunday", 350, 50);
                 Main.mName = "The Batman";
                 Main.tName = "Rajhans Cinemas";
                 Main.time = "10:30 PM";
@@ -181,7 +182,7 @@ class Moive {
                 break;
             }
             case 4: {
-                MovieBooking.book("OPPENHIMER", 320);
+                MovieBooking.book("OPPENHIMER", "PVR : Motera", "11:00 AM", "Saturday", 320, 80);
                 Main.mName = "Oppenhimer";
                 Main.tName = "PVR : Motera";
                 Main.time = "11:00 AM";
@@ -191,10 +192,10 @@ class Moive {
                 break;
             }
             case 5: {
-                MovieBooking.book("AVATAR", 280);
+                MovieBooking.book("AVATAR", "NY Cinemas : Motera", "9:00PM", "Sunday", 280, 100);
                 Main.mName = "Avatar : the way of water";
                 Main.tName = "NY Cinemas : Motera";
-                Main.time = "9:PM";
+                Main.time = "9:00PM";
                 Main.day = "Sunday";
                 Main.price = 280;
                 MovieBooking.seats = 100;
@@ -214,19 +215,25 @@ class MovieBooking {
     static int seats = 20;
     static Booking b = new Booking();
 
-    static void book(String mName, int price) throws SQLException {
-
-        System.out
-                .println("How Many Seats do you want to book? (available seats : " + seats + ") \nPrice : " + price
-                        + " Rs.");
+    static void book(String mName, String tName, String time, String day, int price, int seats) throws SQLException {
+        System.out.println("------------------------------------------------------------------");
+        System.out.println("Movie : " + mName);
+        System.out.println("Theater : " + tName);
+        System.out.println("Time : " + time);
+        System.out.println("Day : " + day);
+        System.out.println("Price : " + price);
+        System.out.println("Total Seats Available : " + seats);
+        System.out.println("------------------------------------------------------------------");
+        System.out.println("How Mmany seats do you want to book?");
         int s = sc.nextInt();
         sc.nextLine();
         if (s > seats) {
-            System.out.println("Sorry Seats not Available as much as you are asking");
+            System.out.println("We are Sorry Seats not available as much as you are asking for");
         } else {
             seats -= s;
             Main.seats = s;
             Booking.amount = s * price;
+            System.out.println("Total Amount : " + Booking.amount);
             Main.amount = (int) Booking.amount;
             b.setName(Main.uName);
             b.start();
@@ -235,48 +242,125 @@ class MovieBooking {
 }
 
 class Booking extends Thread {
-    Billing b = new Billing();
+    Payement p = new Payement();
     static Scanner sc = new Scanner(System.in);
     static double amount;
     int seats;
 
     public void run() {
         try {
-            b.bill(amount);
+            p.bill(amount);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
 
-class Billing {
+class Payement {
+    static OTP o = new OTP();
+    static int genratedOTP = 0;
     static Scanner sc = new Scanner(System.in);
 
     synchronized void bill(double amount) throws Exception {
-        System.out.println("Your total is : " + amount);
+        System.out.println("Choose a payment method");
+        System.out.println("1. Net Banking");
+        System.out.println("2. UPI");
+        int n = sc.nextInt();
+        sc.nextLine();
+        if (n == 1) {
+            netBanking();
+        } else if (n == 2) {
+
+        } else {
+            System.out.println("Wrong choice!\nplease select a valid option");
+        }
+
+    }
+
+    static void netBanking() throws Exception {
+        System.out.println("Enter your account number");
+        String accNo = sc.nextLine();
+        System.out.println("Enter your phone number");
+        String pNo = sc.nextLine();
+        boolean valid = false;
+        while (!valid) {
+            if (accNo.length() != 12 && pNo.length() != 10) {
+                System.out.println("Invalid Phone number or Account no please try again");
+                System.out.println("Account number");
+                accNo = sc.nextLine();
+                System.out.println("Phone number");
+                pNo = sc.nextLine();
+            } else {
+                o.start();
+                System.out.println("Wait for 5 seconds \nYour OTP is being genrated");
+                int otp = sc.nextInt();
+                sc.nextLine();
+                valid = false;
+                while (!valid) {
+                    if (otp != OTP.otp) {
+                        System.out.println("OTP Miss Matched!! \nplease try again");
+                        otp = sc.nextInt();
+                        sc.nextLine();
+                    } else {
+                        pay();
+                        valid = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    static void pay() throws Exception {
+        System.out.println("Total Amount : " + Booking.amount);
         System.out.println("Enter amount");
-        double pay = sc.nextDouble();
+        int amt = sc.nextInt();
         sc.nextLine();
         boolean valid = false;
-        do {
-            if (pay != amount) {
-                System.out.println("Please entere valid amount");
-                pay = sc.nextDouble();
-                if (pay == amount) {
-                    System.out.println("Your seats have been booked Successfully");
-                    System.out.println("Thank you for using our app!!");
-                    valid = true;
-                    Main.updateTransaction();
-                    Main.genrateBill();
-                    break;
-                }
+        while (!valid) {
+            if (amt != Booking.amount) {
+                System.out.println("Please enter valid amount : " + Booking.amount);
+                amt = sc.nextInt();
+                sc.nextLine();
             } else {
                 System.out.println("Your seats have been booked Successfully");
                 System.out.println("Thank you for using our app!!");
-                valid = true;
                 Main.updateTransaction();
                 Main.genrateBill();
+                valid = true;
             }
-        } while (!valid);
+        }
+    }
+}
+
+class OTP extends Thread {
+    OTPGenrator o = new OTPGenrator();
+    static int otp = 0;
+
+    public void run() {
+        try {
+            sleep(5000);
+        } catch (Exception e) {
+        }
+        try {
+            OTP.otp = o.genrateOTP();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class OTPGenrator {
+    int genrateOTP() throws IOException {
+        int otp = (int) (Math.random() * 4000) + 1;
+        Payement.genratedOTP = otp;
+        File f = new File("C:\\Users\\SMIT PATEL\\OneDrive\\Desktop\\OTPs\\otp.txt");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f, true));
+        bw.write("Your OTP is : " + otp);
+        bw.newLine();
+        bw.flush();
+        System.out.println("Please enter otp");
+        bw.close();
+        return otp;
     }
 }
