@@ -8,15 +8,39 @@ class Main {
     static String dbpass;
     static String driver;
     static Connection con;
+    static Statement st;
     static Scanner sc = new Scanner(System.in);
-    static String uName, uPass, mName, tName, time, day;
+    static String uName, uPass, mName, tName, time, day, pType;
     static int price, seats, amount;
 
     public static void main(String[] args) throws Exception {
+        dburl = "jdbc:mysql://localhost:3306/project";
+        dbuser = "root";
+        dbpass = "";
+        driver = "com.mysql.cj.jdbc.Driver";
+        con = DriverManager.getConnection(dburl, dbuser, dbpass);
+        st = con.createStatement();
         System.out.println("--------------------------Welcome to our Application------------------------------");
-        // System.out.println("Welcome to our Application!!");
         System.out.println("Hope you'll enjoy your booking experience");
-        logIn();
+        System.out.println("1. Already have an Account?");
+        System.out.println("2. Create new Account");
+        System.out.println("Enter your choice");
+        boolean valid = false;
+        while (!valid) {
+            int n = sc.nextInt();
+            sc.nextLine();
+            if (n == 1) {
+                signIn();
+                valid = true;
+            } else if (n == 2) {
+                logIn();
+                valid = true;
+            } else {
+                System.out.println("Wrong choice\nplease select a valid option");
+                n = sc.nextInt();
+                sc.nextLine();
+            }
+        }
     }
 
     static void updateTransaction() throws SQLException {
@@ -25,7 +49,7 @@ class Main {
         dbpass = "";
         driver = "com.mysql.cj.jdbc.Driver";
         con = DriverManager.getConnection(dburl, dbuser, dbpass);
-        String sql = "insert into transactions values(?,?,?,?,?,?,?,?,?)";
+        String sql = "insert into transactions values(?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pst = con.prepareStatement(sql);
         pst.setString(1, uName);
         pst.setString(2, uPass);
@@ -36,14 +60,15 @@ class Main {
         pst.setInt(7, price);
         pst.setInt(8, seats);
         pst.setInt(9, amount);
+        pst.setString(10, pType);
         pst.executeUpdate();
     }
 
     static void genrateBill() throws IOException {
         File f = new File("C:\\Users\\SMIT PATEL\\OneDrive\\Desktop\\Bills\\" + uName + ".txt");
-        BufferedWriter bw = new BufferedWriter(new FileWriter(f, false));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f, true));
 
-        bw.write("Thank You for chosing " + tName);
+        bw.write("---------------Thank You for chosing " + tName + "---------------");
         bw.newLine();
         bw.write("Movie : " + mName);
         bw.newLine();
@@ -60,8 +85,30 @@ class Main {
         bw.write("Amount : " + amount);
         bw.newLine();
         bw.write("Booked by : " + uName);
+        bw.newLine();
+        bw.write("-----------------------------------------------------------");
+        bw.newLine();
         bw.flush();
         bw.close();
+    }
+
+    static void signIn() throws Exception {
+        System.out.println("Enter Your Username");
+        String usName = sc.nextLine();
+        Main.uName = usName;
+        System.out.println("Enter your password");
+        String upass = sc.nextLine();
+        Main.uPass = upass;
+        String sql = "select uName , uPass from transactions where uPass = '" + upass + "'";
+        // st = con.createStatement();
+        ResultSet rs = st.executeQuery(sql);
+        if (rs == null) {
+            System.out.println("Account Not Found");
+        } else {
+            System.out.println("Sign in Successfull");
+            Moive.movie();
+        }
+
     }
 
     static void logIn() throws Exception {
@@ -264,13 +311,15 @@ class Payement {
     synchronized void bill(double amount) throws Exception {
         System.out.println("Choose a payment method");
         System.out.println("1. Net Banking");
-        System.out.println("2. UPI");
+        System.out.println("2. Card");
         int n = sc.nextInt();
         sc.nextLine();
         if (n == 1) {
+            Main.pType = "Net Banking";
             netBanking();
         } else if (n == 2) {
-
+            Main.pType = "Card";
+            card();
         } else {
             System.out.println("Wrong choice!\nplease select a valid option");
         }
@@ -284,11 +333,54 @@ class Payement {
         String pNo = sc.nextLine();
         boolean valid = false;
         while (!valid) {
-            if (accNo.length() != 12 && pNo.length() != 10) {
-                System.out.println("Invalid Phone number or Account no please try again");
-                System.out.println("Account number");
+            if (accNo.length() != 12) {
+                System.out.println("Invalid Account no please try again");
                 accNo = sc.nextLine();
-                System.out.println("Phone number");
+            } else if (pNo.length() != 10) {
+                System.out.println("Invalid Phone numebr");
+                System.out.println("Please try again");
+                pNo = sc.nextLine();
+            } else {
+                o.start();
+                System.out.println("Wait for 5 seconds \nYour OTP is being genrated");
+                int otp = sc.nextInt();
+                sc.nextLine();
+                valid = false;
+                while (!valid) {
+                    if (otp != OTP.otp) {
+                        System.out.println("OTP Miss Matched!! \nplease try again");
+                        otp = sc.nextInt();
+                        sc.nextLine();
+                    } else {
+                        pay();
+                        valid = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    static void card() throws Exception {
+        System.out.println("Enter your credit or debit card number");
+        String cardNo = sc.nextLine();
+        System.out.println("Enter your CVV");
+        String cvv = sc.nextLine();
+        System.out.println("Enter your phone number");
+        String pNo = sc.nextLine();
+        boolean valid = false;
+        while (!valid) {
+            if (cardNo.length() != 16) {
+                System.out.println("Invalid Card number");
+                System.out.println("Please try again");
+                cardNo = sc.nextLine();
+            } else if (cvv.length() != 3) {
+                System.out.println("Invalid CVV");
+                System.out.println("Please try again");
+                cvv = sc.nextLine();
+            } else if (pNo.length() != 10) {
+                System.out.println("Invalid Phone Number");
+                System.out.println("Please try again");
                 pNo = sc.nextLine();
             } else {
                 o.start();
