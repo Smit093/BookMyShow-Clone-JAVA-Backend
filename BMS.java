@@ -279,8 +279,10 @@ class MovieBooking {
         } else {
             seats -= s;
             Main.seats = s;
-            Booking.amount = s * price;
-            System.out.println("Total Amount : " + Booking.amount);
+            int total = s * price;
+            System.out.println("Your amount is  : " + total);
+            Booking.amount = (int) ((total) + (total * 0.18));
+            System.out.println("Total Amount after adding gst(0.18%): " + Booking.amount);
             Main.amount = (int) Booking.amount;
             b.setName(Main.uName);
             b.start();
