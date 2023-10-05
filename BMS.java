@@ -14,7 +14,7 @@ class Main {
     static int price, seats, amount;
 
     public static void main(String[] args) throws Exception {
-        dburl = "jdbc:mysql://localhost:3306/project";
+        dburl = "jdbc:mysql://localhost:3306/smit";
         dbuser = "root";
         dbpass = "";
         driver = "com.mysql.cj.jdbc.Driver";
@@ -44,12 +44,14 @@ class Main {
     }
 
     static void updateTransaction() throws SQLException {
-        dburl = "jdbc:mysql://localhost:3306/project";
+        dburl = "jdbc:mysql://localhost:3306/smit";
         dbuser = "root";
         dbpass = "";
         driver = "com.mysql.cj.jdbc.Driver";
         con = DriverManager.getConnection(dburl, dbuser, dbpass);
-        String sql = "insert into transactions values(?,?,?,?,?,?,?,?,?,?)";
+        String sql = "create table if not exists transactions (uName varchar(20),uPass varchar(255),mName varchar(20),tName varchar(255),time varchar(20),day varchar(20),price int,seats int,amount int , pType varchar(20))";
+        st.execute(sql);
+         sql = "insert into transactions values(?,?,?,?,?,?,?,?,?,?)";
         PreparedStatement pst = con.prepareStatement(sql);
         pst.setString(1, uName);
         pst.setString(2, uPass);
@@ -175,7 +177,7 @@ class Moive {
     static Scanner sc = new Scanner(System.in);
 
     static void movie() throws Exception {
-        dburl = "jdbc:mysql://localhost:3306/project";
+        dburl = "jdbc:mysql://localhost:3306/smit";
         dbuser = "root";
         dbpass = "";
         driver = "com.mysql.cj.jdbc.Driver";
@@ -259,7 +261,7 @@ class Moive {
 
 class MovieBooking {
     static Scanner sc = new Scanner(System.in);
-    static int seats = 20;
+    static int seats;
     static Booking b = new Booking();
 
     static void book(String mName, String tName, String time, String day, int price, int seats) throws SQLException {
